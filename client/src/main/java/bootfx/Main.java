@@ -1,4 +1,4 @@
-package c1.two;
+package bootfx;
 
 import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,6 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Main {
 
 	public static void main(String args[]) {
-		Application.launch(SimpleApplication.class, args);
+		Application.launch(JavaFxApplication.class, args);
 	}
 }

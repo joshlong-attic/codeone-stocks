@@ -1,4 +1,4 @@
-package c1.two;
+package bootfx;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-class StageProcessor {
+class StageListener {
 
 	@EventListener(StageReadyEvent.class)
 	public void stageIsReady(StageReadyEvent event) {

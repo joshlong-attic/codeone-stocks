@@ -1,4 +1,4 @@
-package c1.two;
+package bootfx;
 
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationEvent;

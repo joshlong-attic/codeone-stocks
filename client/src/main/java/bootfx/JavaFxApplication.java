@@ -1,4 +1,4 @@
-package c1.two;
+package bootfx;
 
 import javafx.application.Application;
 import javafx.application.HostServices;
@@ -10,7 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
 @Log4j2
-public class SimpleApplication extends Application {
+public class JavaFxApplication extends Application {
 
 	private ConfigurableApplicationContext context;
 
@@ -18,7 +18,7 @@ public class SimpleApplication extends Application {
 	public void init() {
 		ApplicationContextInitializer<GenericApplicationContext> initializer =
 			context -> {
-				context.registerBean(Application.class, () -> SimpleApplication.this);
+				context.registerBean(Application.class, () -> JavaFxApplication.this);
 				context.registerBean(Parameters.class, this::getParameters);
 				context.registerBean(HostServices.class, this::getHostServices);
 			};

@@ -75,7 +75,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>c1.two.SimpleApplication</mainClass>
+                    <mainClass>bootfx.JavaFxApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
