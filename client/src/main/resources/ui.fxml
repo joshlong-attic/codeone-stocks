@@ -7,7 +7,7 @@
     <LineChart fx:id="stockticker" title="Price Over Time" prefHeight="500"
                legendVisible="false">
         <xAxis>
-            <CategoryAxis label="Time" animated="false"/>
+            <CategoryAxis label="Stock" animated="false"/>
         </xAxis>
         <yAxis>
             <NumberAxis label="Price"/>

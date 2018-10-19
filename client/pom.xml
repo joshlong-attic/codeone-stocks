@@ -75,8 +75,10 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>bootfx.JavaFxApplication</mainClass>
+                    <mainClass>bootfx.Main</mainClass>
+                    <executable>true</executable>
                 </configuration>
+
             </plugin>
         </plugins>
     </build>

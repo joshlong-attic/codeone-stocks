@@ -14,8 +14,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -27,8 +25,6 @@ public class StockController {
 
 	private final StockClient stockClient;
 
-	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-
 	private final Collection<String> stocks = Arrays.asList(
 		"ORCL", "PVTL", "MSFT", "GOOG", "AWS");
 
@@ -37,10 +33,7 @@ public class StockController {
 			.stream()
 			.collect(Collectors.toMap(k -> k, k -> new XYChart.Series<>(FXCollections.observableArrayList())));
 
-	private final Runnable runnable = () ->
-		stocks.forEach(this::contributeNewPriceToTicker);
-
-	public StockController(StockClient stockClient) {
+	StockController(StockClient stockClient) {
 		this.stockClient = stockClient;
 	}
 
@@ -50,18 +43,20 @@ public class StockController {
 		stockticker.setData(FXCollections.observableList(values));
 	}
 
-	private void contributeNewPriceToTicker(String ticker) {
+	private void contributeNewPriceToTicker(StockPrice ticker) {
 		Platform.runLater(() -> {
-			var price = ThreadLocalRandom.current().nextDouble(1000);
-			var dataPoint = new XYChart.Data<String, Number>(ticker, price);
-			this.data.get(ticker).getData().add(dataPoint);
+			var dataPoint = new XYChart.Data<String, Number>(ticker.getTicker(),
+				ticker.getPrice());
+			this.data.get(ticker.getTicker()).getData().add(dataPoint);
 			this.updateChart();
 		});
 	}
 
 	@FXML
 	public void initialize() {
-		this.executor.scheduleAtFixedRate(this.runnable, 0, 1000,
-			TimeUnit.MILLISECONDS);
+		var publisherMap =
+			this.stocks.stream().collect(Collectors.toMap(k -> k,
+				this.stockClient::pricesFor));
+		publisherMap.values().forEach(p -> p.subscribe(this::contributeNewPriceToTicker));
 	}
 }

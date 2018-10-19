@@ -2,6 +2,7 @@ package bootfx;
 
 import javafx.application.Application;
 import javafx.application.HostServices;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -37,8 +38,8 @@ public class JavaFxApplication extends Application {
 
 	@Override
 	public void stop() throws Exception {
-		super.stop();
 		this.context.close();
+		Platform.exit();
 	}
 }
 
