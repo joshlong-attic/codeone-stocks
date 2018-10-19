@@ -34,7 +34,6 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
 			FXMLLoader fxmlLoader = new FXMLLoader(fxml.getURL());
 			fxmlLoader.setControllerFactory(this.applicationContext::getBean);
 			Parent root = fxmlLoader.load();
-			drawStockScreen(root);
 			Scene scene = new Scene(root, 800, 600);
 			stage.setScene(scene);
 			stage.setTitle(this.applicationTitle);
@@ -43,8 +42,5 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private void drawStockScreen(Parent parent) {
 	}
 }

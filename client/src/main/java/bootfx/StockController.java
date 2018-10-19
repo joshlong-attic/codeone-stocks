@@ -8,7 +8,10 @@ import javafx.scene.chart.XYChart;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,9 +22,10 @@ import java.util.stream.Collectors;
 @Component
 public class StockController {
 
-
 	@FXML
 	LineChart<String, Number> stockticker;
+
+	private final StockClient stockClient;
 
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
@@ -32,20 +36,27 @@ public class StockController {
 		stocks
 			.stream()
 			.collect(Collectors.toMap(k -> k, k -> new XYChart.Series<>(FXCollections.observableArrayList())));
-	private final Runnable runnable = () -> {
-		List<XYChart.Series<String, Number>> values =
-			new ArrayList<>(data.values());
-		Platform.runLater(() -> stockticker.setData(FXCollections.observableList(values)));
+
+	private final Runnable runnable = () ->
 		stocks.forEach(this::contributeNewPriceToTicker);
-	};
+
+	public StockController(StockClient stockClient) {
+		this.stockClient = stockClient;
+	}
+
+	private void updateChart() {
+		var values =
+			new ArrayList<XYChart.Series<String, Number>>(data.values());
+		stockticker.setData(FXCollections.observableList(values));
+	}
 
 	private void contributeNewPriceToTicker(String ticker) {
-		Runnable run = () -> {
+		Platform.runLater(() -> {
 			var price = ThreadLocalRandom.current().nextDouble(1000);
 			var dataPoint = new XYChart.Data<String, Number>(ticker, price);
 			this.data.get(ticker).getData().add(dataPoint);
-		};
-		Platform.runLater(run);
+			this.updateChart();
+		});
 	}
 
 	@FXML

@@ -2,6 +2,8 @@ package bootfx;
 
 import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
 	* Why is this a second class? No good reason whatsoever.
@@ -11,6 +13,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 	*/
 @SpringBootApplication
 public class Main {
+
+	@Bean
+	WebClient webClient() {
+		return WebClient.builder().build();
+	}
 
 	public static void main(String args[]) {
 		Application.launch(JavaFxApplication.class, args);
