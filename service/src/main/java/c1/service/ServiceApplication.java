@@ -3,6 +3,7 @@ package c1.service;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ public class ServiceApplication {
 	}
 }
 
+@Log4j2
 @RestController
 class StockRestController {
 
@@ -45,7 +47,11 @@ class StockRestController {
 				}))
 				.delayElements(Duration.ofSeconds(1))
 				.share()
-			);
+				.doOnSubscribe(subscription -> log.info("new subscription for ticker " + ticker + '.'))
+				.doOnCancel(() -> {
+					log.info("removing " + ticker + " stream");
+					this.prices.remove(ticker);
+				}));
 	}
 }
 

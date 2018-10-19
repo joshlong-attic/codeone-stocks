@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Date;
 
 @Component
@@ -27,6 +28,7 @@ public class StockClient {
 			.uri("http://localhost:8080/stocks/{t}", ticker)
 			.retrieve()
 			.bodyToFlux(StockPrice.class)
+			.retryBackoff(10, Duration.ofSeconds(1), Duration.ofSeconds(30))
 			.doOnError(IOException.class,
 				ioEx -> log.info("closing stream for " + ticker + '.'));
 	}
