@@ -1,5 +1,10 @@
 package bootfx;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.rsocket.Payload;
+import io.rsocket.RSocketFactory;
+import io.rsocket.transport.netty.client.TcpClientTransport;
+import io.rsocket.util.DefaultPayload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +17,53 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
 
+
+public interface StockClient {
+	Flux<StockPrice> pricesFor(String ticker);
+}
+
 @Component
 @Log4j2
-public class StockClient {
+class RSocketStockClient implements StockClient {
+
+	private final TcpClientTransport transport = TcpClientTransport.create(7000);
+	private final ObjectMapper objectMapper;
+
+	RSocketStockClient(ObjectMapper om) {
+		this.objectMapper = om;
+	}
+
+	@Override
+	public Flux<StockPrice> pricesFor(String ticker) {
+		return RSocketFactory
+			.connect()
+			.transport(this.transport)
+			.start()
+			.flatMapMany(rSocket ->
+				rSocket
+					.requestStream(DefaultPayload.create(ticker))
+					.map(Payload::getDataUtf8)
+					.map(json -> {
+						try {
+							return this.objectMapper
+								.readValue(json, StockPrice.class);
+						}
+						catch (IOException e) {
+							throw new RuntimeException(e);
+						}
+					})
+					.doFinally(signal -> rSocket.dispose())
+			);
+	}
+}
+
+//@Component
+@Log4j2
+class WebClientStockClient implements StockClient {
 
 	private final WebClient webClient;
 
-	StockClient(WebClient webClient) {
+	WebClientStockClient(WebClient webClient) {
 		this.webClient = webClient;
 	}
 
@@ -29,8 +74,7 @@ public class StockClient {
 			.retrieve()
 			.bodyToFlux(StockPrice.class)
 			.retryBackoff(10, Duration.ofSeconds(1), Duration.ofSeconds(30))
-			.doOnError(IOException.class,
-				ioEx -> log.info("closing stream for " + ticker + '.'));
+			.doOnError(IOException.class, ioEx -> log.info("closing stream for " + ticker + '.'));
 	}
 }
 
