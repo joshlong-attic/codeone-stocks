@@ -56,6 +56,7 @@ class StockRSocketController(
 								.ensureStreamExists(payload.dataUtf8)
 								.map { objectMapper.writeValueAsString(it) }
 								.map { DefaultPayload.create(it) }
+								.doFinally { dispose() }
 			})
 		}
 		RSocketFactory

@@ -95,7 +95,8 @@ class StockRSocketController {
 					return stockService
 						.ensureStreamExists(payload.getDataUtf8())
 						.map(sp -> json(sp))
-						.map(DefaultPayload::create);
+						.map(DefaultPayload::create)
+						.doFinally( signal -> dispose());
 				}
 			});
 
