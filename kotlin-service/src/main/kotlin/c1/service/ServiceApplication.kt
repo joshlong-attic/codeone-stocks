@@ -2,7 +2,6 @@ package c1.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.rsocket.*
-import io.rsocket.transport.netty.server.NettyContextCloseable
 import io.rsocket.transport.netty.server.TcpServerTransport
 import io.rsocket.util.DefaultPayload
 import org.apache.commons.logging.LogFactory
@@ -20,6 +19,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 
@@ -56,25 +56,22 @@ class StockRSocketController(
 								.ensureStreamExists(payload.dataUtf8)
 								.map { objectMapper.writeValueAsString(it) }
 								.map { DefaultPayload.create(it) }
-
 			})
 		}
-
 		RSocketFactory
 				.receive()
 				.acceptor(socketAcceptor)
-				.transport<NettyContextCloseable>(this.tcpServerTransport)
+				.transport(this.tcpServerTransport)
 				.start()
 				.subscribe()
 	}
-
 }
 
 @Service
 class StockService {
 
 	private val log = LogFactory.getLog(javaClass)
-	private val prices = mutableMapOf<String, Flux<StockPrice>>()
+	private val prices = ConcurrentHashMap<String, Flux<StockPrice>>()
 
 	private fun randomStockPrice(ticker: String): StockPrice {
 		val price = ThreadLocalRandom.current().nextDouble(1500.0)
