@@ -82,6 +82,7 @@ class WebClientStockClient implements StockClient {
 @AllArgsConstructor
 @NoArgsConstructor
 class StockPrice {
+	private String id;
 	private String ticker;
 	private double price;
 	private Date when;

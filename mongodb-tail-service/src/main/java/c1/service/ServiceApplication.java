@@ -17,6 +17,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.mongodb.repository.Tailable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -26,12 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Stream;
 
 @SpringBootApplication
 public class ServiceApplication {
@@ -41,25 +38,25 @@ public class ServiceApplication {
 	}
 }
 
+interface StockPriceRepository extends ReactiveMongoRepository<StockPrice, String> {
+
+	@Tailable
+	Flux<StockPrice> findByTicker(String t);
+}
+
 @Log4j2
 @Service
 class StockService {
 
-	private final Map<String, Flux<StockPrice>> prices = new ConcurrentHashMap<>();
+	private final StockPriceRepository stockPriceRepository;
 
-	private StockPrice randomStockPrice(String ticker) {
-		double price = ThreadLocalRandom.current().nextDouble(1500);
-		return new StockPrice(ticker, price, new Date());
+	StockService(StockPriceRepository stockPriceRepository) {
+		this.stockPriceRepository = stockPriceRepository;
 	}
 
 	Flux<StockPrice> ensureStreamExists(String ticker) {
-		return this.prices
-			.computeIfAbsent(ticker, stock -> Flux
-				.fromStream(Stream.generate(() -> this.randomStockPrice(ticker)))
-				.delayElements(Duration.ofSeconds(1))
-				.share()
-				.doOnSubscribe(subscription -> log.info("new subscription for ticker " + ticker + '.'))
-				.doOnCancel(() -> this.prices.remove(ticker)));
+		return this.stockPriceRepository
+			.findByTicker(ticker);
 	}
 }
 
@@ -68,11 +65,11 @@ class StockRSocketController {
 
 	private final TcpServerTransport tcpServerTransport = TcpServerTransport.create(7000);
 	private final ObjectMapper objectMapper;
-	private final StockService stockService;
+	private final StockPriceRepository repository;
 
-	StockRSocketController(ObjectMapper objectMapper, StockService stockService) {
+	StockRSocketController(ObjectMapper objectMapper, StockPriceRepository repository) {
 		this.objectMapper = objectMapper;
-		this.stockService = stockService;
+		this.repository = repository;
 	}
 
 	private String json(StockPrice sp) {
@@ -93,8 +90,7 @@ class StockRSocketController {
 
 				@Override
 				public Flux<Payload> requestStream(Payload payload) {
-					return stockService
-						.ensureStreamExists(payload.getDataUtf8())
+					return repository.findByTicker(payload.getDataUtf8())
 						.map(sp -> json(sp))
 						.map(DefaultPayload::create)
 						.doFinally(signal -> dispose());
@@ -115,15 +111,15 @@ class StockRSocketController {
 @RestController
 class StockRestController {
 
-	private final StockService stockService;
+	private final StockPriceRepository stockPriceRepository;
 
-	StockRestController(StockService stockService) {
-		this.stockService = stockService;
+	StockRestController(StockPriceRepository stockPriceRepository) {
+		this.stockPriceRepository = stockPriceRepository;
 	}
 
 	@GetMapping(value = "/stocks/{ticker}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	Flux<StockPrice> getPriceSeriesFor(@PathVariable String ticker) {
-		return stockService.ensureStreamExists(ticker);
+		return this.stockPriceRepository.findByTicker(ticker);
 	}
 }
 
@@ -131,6 +127,8 @@ class StockRestController {
 @AllArgsConstructor
 @NoArgsConstructor
 class StockPrice {
+	@Id
+	private String id;
 	private String ticker;
 	private double price;
 	private Date when;

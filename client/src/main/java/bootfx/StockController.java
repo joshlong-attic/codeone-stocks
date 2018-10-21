@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -26,7 +24,7 @@ public class StockController {
 	private final StockClient stockClient;
 
 	private final Collection<String> stocks = Arrays.asList(
-		"ORCL", "PVTL", "MSFT", "GOOG", "AWS");
+		"ADOB", "AWS", "GOOG", "IBM", "MSFT", "ORCL", "PVTL", "RHT");
 
 	private final Map<String, XYChart.Series<String, Number>> data =
 		stocks
