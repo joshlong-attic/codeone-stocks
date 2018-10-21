@@ -30,11 +30,12 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
 	public void onApplicationEvent(StageReadyEvent stageReadyEvent) {
 		try {
 			Stage stage = stageReadyEvent.getStage();
-			ClassPathResource fxml = new ClassPathResource("/ui.fxml");
+			ClassPathResource fxml = new ClassPathResource("/dashboard.fxml");
 			FXMLLoader fxmlLoader = new FXMLLoader(fxml.getURL());
 			fxmlLoader.setControllerFactory(this.applicationContext::getBean);
 			Parent root = fxmlLoader.load();
 			Scene scene = new Scene(root, 800, 600);
+			scene.getStylesheets().add(getClass().getResource("/default.css").toString());
 			stage.setScene(scene);
 			stage.setTitle(this.applicationTitle);
 			stage.show();

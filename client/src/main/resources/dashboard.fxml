@@ -1,0 +1,6 @@
+<?import javafx.scene.layout.GridPane?>
+<GridPane xmlns:fx="http://javafx.com/fxml"
+          alignment="center" hgap="10" vgap="10">
+    <fx:include source="chart.fxml" fx:id="chart" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+    <fx:include source="stats.fxml" fx:id="stats" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+</GridPane>

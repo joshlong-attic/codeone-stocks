@@ -1,5 +1,6 @@
 package bootfx;
 
+import bootfx.data.StockStats;
 import bootfx.data.SymbolData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
