@@ -1,13 +1,11 @@
 package bootfx;
 
+import bootfx.data.StockPrice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.rsocket.Payload;
 import io.rsocket.RSocketFactory;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.util.DefaultPayload;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,7 +13,6 @@ import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Date;
 
 
 public interface StockClient {
@@ -78,12 +75,3 @@ class WebClientStockClient implements StockClient {
 	}
 }
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class StockPrice {
-	private String id;
-	private String ticker;
-	private double price;
-	private Date when;
-}

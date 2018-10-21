@@ -4,10 +4,10 @@
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml" spacing="10" alignment="CENTER"
       fx:controller="bootfx.StockController">
-    <LineChart fx:id="stockticker" title="Price Over Time" prefHeight="500"
+    <LineChart fx:id="chart" prefHeight="500"
                legendVisible="false">
         <xAxis>
-            <CategoryAxis label="Stock" animated="false"/>
+            <CategoryAxis label="Time" animated="false"/>
         </xAxis>
         <yAxis>
             <NumberAxis label="Price"/>
