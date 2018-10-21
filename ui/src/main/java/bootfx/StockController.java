@@ -1,7 +1,7 @@
 package bootfx;
 
-import bootfx.data.StockStats;
 import bootfx.data.SymbolData;
+import client.StockClient;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,7 +21,7 @@ public class StockController {
 	private final String symbol = "GOOG";
 
 	private final StockClient stockClient;
-	private final SymbolData symbolData	= new SymbolData();
+	private final SymbolData symbolData = new SymbolData();
 
 	StockController(StockClient stockClient) {
 		this.stockClient = stockClient;

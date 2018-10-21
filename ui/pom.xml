@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>c1</groupId>
-    <artifactId>client</artifactId>
+    <artifactId>ui</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -22,24 +22,41 @@
         <project.reporting.outputEncoding>UTF-8
         </project.reporting.outputEncoding>
         <java.version>11</java.version>
-     </properties>
+        <javafx.version>11</javafx.version>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.rsocket</groupId>
-            <artifactId>rsocket-transport-netty</artifactId>
-            <version>0.11.5</version>
+            <groupId>c1</groupId>
+            <artifactId>client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>io.rsocket</groupId>
-            <artifactId>rsocket-core</artifactId>
-            <version>0.11.5</version>
-        </dependency>
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -57,7 +74,19 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>bootfx.Main</mainClass>
+                    <executable>true</executable>
+                </configuration>
 
+            </plugin>
+        </plugins>
+    </build>
     <repositories>
         <repository>
             <id>spring-snapshots</id>

@@ -1,4 +1,4 @@
-package c1.service
+package service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.rsocket.*
@@ -33,7 +33,8 @@ fun main(args: Array<String>) {
 @RestController
 class StockRestController(private val stockService: StockService) {
 
-	@GetMapping(value = ["/stocks/{ticker}"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+	@GetMapping(value = ["/stocks/{ticker}"],
+			produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
 	fun getPriceSeriesFor(@PathVariable ticker: String) =
 			stockService.ensureStreamExists(ticker)
 }
@@ -74,10 +75,8 @@ class StockService {
 	private val log = LogFactory.getLog(javaClass)
 	private val prices = ConcurrentHashMap<String, Flux<StockPrice>>()
 
-	private fun randomStockPrice(ticker: String): StockPrice {
-		val price = ThreadLocalRandom.current().nextDouble(1500.0)
-		return StockPrice(ticker, price, Date())
-	}
+	private fun randomStockPrice(ticker: String) =
+		StockPrice(ticker, ThreadLocalRandom.current().nextDouble(1500.0), Date())
 
 	fun ensureStreamExists(ticker: String): Flux<StockPrice> = this.prices
 			.computeIfAbsent(ticker) { _ ->
