@@ -1,4 +1,4 @@
-package bootfx;
+package bootfx.fxcontroller;
 
 import bootfx.data.SymbolData;
 import client.StockClient;
