@@ -24,5 +24,14 @@ public class StatsController {
 		StockStats stockStats = new StockStats();
 		stats.setItems(stockStats.getData());
 		this.stockClient.pricesFor(symbol).subscribe(stockStats);
+
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+		//need to stop the old feed? and subscribe to the new one
+
+		//reset UI and resubscribe
+		initialize();
 	}
 }
