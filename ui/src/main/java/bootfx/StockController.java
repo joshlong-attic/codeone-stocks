@@ -1,9 +1,7 @@
-package bootfx.fxcontroller;
+package bootfx;
 
-import bootfx.data.SymbolData;
+import bootfx.SymbolData;
 import client.StockClient;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;

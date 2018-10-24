@@ -3,7 +3,7 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml" spacing="10" alignment="CENTER"
-      fx:controller="bootfx.fxcontroller.StockController">
+      fx:controller="bootfx.StockController">
     <LineChart fx:id="chart" prefHeight="500"
                legendVisible="false">
         <xAxis>

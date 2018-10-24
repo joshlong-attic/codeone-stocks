@@ -1,4 +1,4 @@
-package bootfx.data;
+package bootfx;
 
 import client.StockPrice;
 import javafx.collections.FXCollections;
