@@ -14,11 +14,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @SpringBootApplication
 public class JavaFxApplication extends Application {
 
-	@Bean
-	WebClient client() {
-		return WebClient.builder().build();
-	}
-
 	private ConfigurableApplicationContext context;
 
 	@Override
