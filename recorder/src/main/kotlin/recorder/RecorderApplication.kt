@@ -32,7 +32,5 @@ class Recorder(
 				.pricesFor("GOOG")
 				.doOnNext { println("recording ${it } ") }
 				.subscribe { spr.save(it) }
-
-
 	}
 }
