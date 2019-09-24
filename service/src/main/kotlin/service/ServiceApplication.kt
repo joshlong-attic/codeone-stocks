@@ -1,22 +1,16 @@
 package service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import io.rsocket.*
-import io.rsocket.transport.netty.server.TcpServerTransport
-import io.rsocket.util.DefaultPayload
 import org.apache.commons.logging.LogFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
-import org.springframework.context.event.EventListener
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
+import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.stereotype.Controller
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -39,34 +33,11 @@ class StockRestController(private val stockService: StockService) {
 			stockService.ensureStreamExists(ticker)
 }
 
-@Component
-class StockRSocketController(
-		private val objectMapper: ObjectMapper,
-		private val stockService: StockService) {
+@Controller
+class StockPricesRSocketController(private val stockService: StockService) {
 
-	private val tcpServerTransport = TcpServerTransport.create(7000)
-
-	@EventListener(ApplicationReadyEvent::class)
-	fun serve(evt: ApplicationReadyEvent) {
-
-		val socketAcceptor = SocketAcceptor { _, _ ->
-			Mono.just<RSocket>(object : AbstractRSocket() {
-
-				override fun requestStream(payload: Payload) =
-						stockService
-								.ensureStreamExists(payload.dataUtf8)
-								.map { objectMapper.writeValueAsString(it) }
-								.map { DefaultPayload.create(it) }
-								.doFinally { dispose() }
-			})
-		}
-		RSocketFactory
-				.receive()
-				.acceptor(socketAcceptor)
-				.transport(this.tcpServerTransport)
-				.start()
-				.subscribe()
-	}
+	@MessageMapping("stockPrices")
+	fun prices(symbol: String) = stockService.ensureStreamExists(symbol)
 }
 
 @Service

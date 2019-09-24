@@ -1,47 +1,23 @@
 package client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.rsocket.Payload;
-import io.rsocket.RSocketFactory;
-import io.rsocket.transport.netty.client.TcpClientTransport;
-import io.rsocket.util.DefaultPayload;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.springframework.messaging.rsocket.RSocketRequester;
 import reactor.core.publisher.Flux;
 
-import java.io.IOException;
-
- @Log4j2
+@Log4j2
 class RSocketStockClient implements StockClient {
 
-	private final TcpClientTransport transport = TcpClientTransport.create(7000);
-	private final ObjectMapper objectMapper;
+	private final RSocketRequester rSocketRequester;
 
-	RSocketStockClient(ObjectMapper om) {
-		this.objectMapper = om;
+	RSocketStockClient(RSocketRequester.Builder builder) {
+		rSocketRequester = builder.connectTcp("localhost", 7000)
+								  .block();
 	}
 
 	@Override
 	public Flux<StockPrice> pricesFor(String ticker) {
-		return RSocketFactory
-			.connect()
-			.transport(this.transport)
-			.start()
-			.flatMapMany(rSocket ->
-				rSocket
-					.requestStream(DefaultPayload.create(ticker))
-					.map(Payload::getDataUtf8)
-					.map(json -> {
-						try {
-							return this.objectMapper
-								.readValue(json, StockPrice.class);
-						}
-						catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-					})
-					.doFinally(signal -> rSocket.dispose())
-			);
+		return rSocketRequester.route("stockPrices")
+							   .data(ticker)
+							   .retrieveFlux(StockPrice.class);
 	}
 }
